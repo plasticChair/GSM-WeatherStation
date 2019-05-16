@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['line']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Sales', 'Expenses'],
+          ['2004',  1000,      400],
+          ['2005',  1170,      460],
+          ['2006',  660,       1120],
+          ['2007',  1030,      540]
+        ]);
+
+        var options = {
+          title: 'Company Performance',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.charts.Line(document.getElementById('curve_chart'));
+		var chart2 = new google.charts.Line(document.getElementById('curve_chart2'));
+		var chart3 = new google.charts.Line(document.getElementById('curve_chart3'));
+
+        chart.draw(data, options);
+		chart2.draw(data, options);
+		chart3.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="curve_chart" style="width: 1200px; height: 300px"></div>
+	<p><br /></p>
+
+	<div id="curve_chart2" style="width: 1200px; height: 300px"></div>
+	<p><br /></p>
+	<div id="curve_chart3" style="width: 1200px; height: 300px"></div>
+  </body>
+</html>

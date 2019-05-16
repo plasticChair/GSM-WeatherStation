@@ -1,0 +1,90 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 24pin_Flex_bottom
+D SFV24R-3STBE1HLF
+$ENDCMP
+#
+$CMP BQ21040
+D 1-Cell Li-Ion Charger
+$ENDCMP
+#
+$CMP BQ24210
+D Li-ion Solar Charger, 1 Cell
+$ENDCMP
+#
+$CMP BQ27750
+D 1 Cell Gas Guage and Protection
+K 1 Cell Gas Guage and Protection
+F 1 Cell Gas Guage and Protection
+$ENDCMP
+#
+$CMP CEM9926A
+D Dual N-MOSFET
+K Dual N-MOSFET
+$ENDCMP
+#
+$CMP Conn_01x01
+D Generic connector, single row, 01x01
+K connector
+F ~
+$ENDCMP
+#
+$CMP Conn_01x02
+D Generic connector, single row, 01x02
+K connector
+F ~
+$ENDCMP
+#
+$CMP DIODE
+D Diode symbol for simulation only. Pin order incompatible with official kicad footprints
+K simulation
+F ~
+$ENDCMP
+#
+$CMP DMP2035UTS
+D Dual PMOS, 8 PIN TSSOP
+$ENDCMP
+#
+$CMP ECH8693R
+D Dual NMOS
+$ENDCMP
+#
+$CMP FT230XS
+D Full Speed USB to Basic UART, SSOP-16
+K FTDI USB UART interface converter
+F http://www.ftdichip.com/Products/ICs/FT230X.html
+$ENDCMP
+#
+$CMP LTC4412
+D Low Loss PowerPath, Battery/USB Switch
+$ENDCMP
+#
+$CMP MAX17048
+D Fuel Guage
+$ENDCMP
+#
+$CMP MAX40200
+D Ideal Diode
+$ENDCMP
+#
+$CMP MAX9939
+D SPI PGA
+$ENDCMP
+#
+$CMP TPL5010
+D Watchdog
+$ENDCMP
+#
+$CMP USB_B_Micro
+D USB Mini Type B connector
+K connector USB mini
+F ~
+$ENDCMP
+#
+$CMP touchLCD
+D Generic connector, single row, 01x07, script generated (kicad-library-utils/schlib/autogen/connector/)
+K connector
+F ~
+$ENDCMP
+#
+#End Doc Library

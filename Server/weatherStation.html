@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="dist/dygraph.css">
+    <title>hourly</title>
+    <script type="text/javascript" src="dist/dygraph.js"></script>
+    </script>
+    <script type="text/javascript" src="data.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <link href="test.php" rel="stylesheet" type="text/css">
+    <!--  -->
+    <style>
+        body {
+            background-image: url("background.jpg");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        /* Set the size of the div element that contains the map */
+        #map {
+            height: 400px;
+            /* The height is 400 pixels */
+            width: 100%;
+            /* The width is the width of the web page */
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+
+        <style type="text/css">
+            .tg2 {
+                border-collapse: collapse;
+                border-spacing: 0;
+            }
+            .tg2 td {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                padding: 10px 5px;
+                border-style: solid;
+                border-width: 1px;
+                overflow: hidden;
+                word-break: normal;
+                border-color: black;
+            }
+            .tg2 th {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                font-weight: normal;
+                padding: 10px 5px;
+                border-style: solid;
+                border-width: 1px;
+                overflow: hidden;
+                word-break: normal;
+                border-color: black;
+            }
+            .tg2 .tg2-0lax {
+                text-align: left;
+                vertical-align: top
+            }
+            .tg2 .tg2-0lay {
+                text-align: left;
+                vertical-align: top;
+                font-family: Arial, sans-serif;
+                font-size: 24px;
+                font-weight: normal;
+                padding: 10px 5px;
+                border-style: solid;
+                border-width: 1px;
+                overflow: hidden;
+                word-break: normal;
+                border-color: black;
+                background-color: #656565;
+                color: #ffffff;
+            }
+        </style>
+
+        <style type="text/css">
+            .tg {
+                border-collapse: collapse;
+                border-spacing: 0;
+            }
+            .tg td {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                padding: 4px 5px;
+                border-style: solid;
+                border-width: 1px;
+                overflow: hidden;
+                word-break: normal;
+                border-color: black;
+            }
+            .tg th {
+                font-family: Arial, sans-serif;
+                font-size: 14px;
+                font-weight: normal;
+                padding: 4px 5px;
+                border-style: solid;
+                border-width: 1px;
+                overflow: hidden;
+                word-break: normal;
+                border-color: black;
+            }
+            .tg .tg-1wig {
+                font-weight: bold;
+                text-align: left;
+                vertical-align: top
+            }
+            .tg .tg-baqh {
+                text-align: center;
+                vertical-align: top
+            }
+            .tg .tg-c8dp {
+                background-color: #656565;
+                color: #ffffff;
+                text-align: left;
+                vertical-align: top
+            }
+            .tg .tg-0lax {
+                text-align: left;
+                vertical-align: top
+            }
+
+        </style>
+
+        <!-- 
+
+<div id="clouds">
+        <div class="nuvem nuvem-1"></div>
+      <!--   <div class="nuvem nuvem-2"></div>
+        <div class="nuvem nuvem-3"></div>
+        <div class="nuvem nuvem-4"></div>
+        <div class="nuvem nuvem-5"></div> 
+</div>
+
+-->
+
+        <table class="tg2" style="background-color: white;">
+            <col width="230">
+
+            <tr style="background-color: white;">
+                <th class="tg2-0lay" colspan="3">Mustang Mountain Weather Station</th>
+
+            </tr>
+            <tr>
+                <th>
+                    <div class="caixa"></div> <i></i>
+                    <input type="button" class="button2" onclick='devModeEn(1)' style="color: transparent; background-color: transparent; border-color: transparent;">
+
+                </th>
+                <th class="tg-0lax">
+                    <iframe src="getStats.php" height="175" width="330" frameBorder="0"></iframe>
+                    <br>
+               
+                    Change measurement Interval
+                    <br>
+                    <input type="button" class="button2" onclick='updateMeasInt(2)' value="10 Sec">
+                    <input type="button" class="button2" onclick='updateMeasInt(3)' value="15 Sec">
+                    <input type="button" class="button2" onclick='updateMeasInt(6)' value="30 Sec">
+                    <br>
+                    Change Server Interval
+                    <br>
+                    <input type="button" class="button2" onclick='updateServerInt(3)' value="3min">
+                    <input type="button" class="button2" onclick='updateServerInt(5)' value="5min">
+                    <input type="button" class="button2" onclick='updateServerInt(10)' value="10min">
+                    
+                    <div class="data"></div>
+                </th>
+                <th class="tg2-0lax">
+                    <div class="mapouter">
+                        <div class="gmap_canvas">
+                            <iframe width="359" height="280" id="gmap_canvas" src="https://maps.google.com/maps?q=31.693335,-110.502125&t=&z=12&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0">
+                            </iframe><a href="https://www.pureblack.de/webdesign-koeln/"></a>
+                        </div>
+                        <style>
+                            .mapouter {
+                                text-align: right;
+                                height: 280px;
+                                width: 359px;
+                            }
+
+                            .gmap_canvas {
+                                overflow: hidden;
+                                background: none !important;
+                                height: 280px;
+                                width: 359px;
+                            }
+
+                        </style>
+                    </div>
+                </th>
+            </tr>
+        </table>
+    </center>
+
+
+    <body onload="updatePlot(1)">
+        <!-- num Data Points: <input type = 'text' id = 'numData' value = 5> <br /> -->
+        <style>
+            .button {
+                background-color: #4CAF50;
+                border: none;
+                color: black;
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 24px;
+                margin: 4px 2px;
+                cursor: pointer;
+            }
+
+        </style>
+        <!--
+      <form name = 'myForm' style="background-color: white;">
+        <input type = 'button' onclick = 'updatePlot(5)' value = '3H'/>
+        <input type = 'button' onclick = 'updatePlot(12)' value = '6H'/>
+        <input type = 'button' onclick = 'updatePlot(20)' value = '12H'/>
+        <input type = 'button' onclick = 'updatePlot(99)' value = 'All'/>
+    </form>
+    -->
+        <center>
+            <input type="button" class="button" onclick='updatePlot(3)' value="3H">
+            <input type="button" class="button" onclick='updatePlot(6)' value="6H">
+            <input type="button" class="button" onclick='updatePlot(12)' value="12H">
+            <input type="button" class="button" onclick='updatePlot(24)' value="1 Day">
+            <input type="button" class="button" onclick='updatePlot(120)' value="5 Days">
+            <input type="button" class="button" onclick='updatePlot(360)' value="15 Days">
+            <!-- <div id="chartHelp" style="width:1000px; height:10;background-color: white;">   </div> -->
+            <div id="WindSpeedChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <!-- <div id="GustMaxChart" style="width:1000px; height:300px;background-color: white;"></div> -->
+            <div id="WindDirectionChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="WindHistChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="TemperatureChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="PressureChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="HumidityChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="BatteryPChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="BatteryVChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="RSSIChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="LowPowerModeChart" style="width:1000px; height:300px;background-color: white;"></div>
+            <div id="NumResetChart" style="width:1000px; height:300px;background-color: white;"></div>
+            
+        </center>
+
+
+        <div id="background-wrap">
+            <div class="x1">
+                <div class="cloud"></div>
+            </div>
+            <div class="x2">
+                <div class="cloud"></div>
+            </div>
+            <div class="x3">
+                <div class="cloud"></div>
+            </div>
+            <div class="x4">
+                <div class="cloud"></div>
+            </div>
+            <div class="x5">
+                <div class="cloud"></div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+
+
+
+
+        
+
+        function devModeEn(val){
+            var LPEn = document.getElementById("LowPowerModeChart");
+            var NREn = document.getElementById("NumResetChart");
+            
+            if (val){
+                LPEn.style.display = "block";
+                NREn.style.display = "block";
+            }
+            else {
+                LPEn.style.display = "none";
+                NREn.style.display = "none";
+            }
+            
+        }
+        
+            
+            function updateMeasInt(measInt) {
+                /* ---------Check password--------------*/
+                var userPassword = prompt("Enter Password");
+                  $.get('passCheckUpdate.php?userPassword=' + userPassword, function(data, status) {
+                  $('.data').html(data);
+                      if (data == 1){
+                            /* ---------Set Interval--------------*/
+                            $.get('setCommand.php?measureInterval=' + measInt, function(data) {
+                                $('.data').html(data);
+                            });
+                      }
+                      else{
+                          alert('Wrong password :(')
+                      }
+                });
+            }
+            
+            
+            function updateServerInt(serverInt) {
+                /* ---------Check password--------------*/
+                var userPassword = prompt("Enter Password");
+                  $.get('passCheckUpdate.php?userPassword=' + userPassword, function(data, status) {
+                  $('.data').html(data);
+                      
+                      if (data == 1){
+                            /* ---------Set Interval--------------*/
+                            $.get('setCommand.php?serverInterval=' + serverInt, function(data) {
+                                $('.data').html(data);
+                            });
+                      }
+                      else{
+                          alert('Wrong password :(')
+                      }
+                });
+            }
+
+            function mobiledetect() {
+
+                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+                    return true;
+                    // Take the user to a different screen here.
+                } else {
+                    return false;
+                }
+            }
+            
+              function darkenColor(colorStr) {
+                    // Defined in dygraph-utils.js
+                    var color = Dygraph.toRGB_(colorStr);
+                    color.r = Math.floor((255 + color.r) / 2);
+                    color.g = Math.floor((255 + color.g) / 2);
+                    color.b = Math.floor((255 + color.b) / 2);
+                    return 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+              }
+            
+             function barChartPlotter(e) {
+                var ctx = e.drawingContext;
+                var points = e.points;
+                var y_bottom = e.dygraph.toDomYCoord(0);
+
+                ctx.fillStyle = darkenColor(e.color);
+
+                // Find the minimum separation between x-values.
+                // This determines the bar width.
+                var min_sep = Infinity;
+                for (var i = 1; i < points.length; i++) {
+                  var sep = points[i].canvasx - points[i - 1].canvasx;
+                  if (sep < min_sep) min_sep = sep;
+                }
+                var bar_width = Math.floor(2.0 / 3 * min_sep);
+
+                // Do the actual plotting.
+                for (var i = 0; i < points.length; i++) {
+                  var p = points[i];
+                  var center_x = p.canvasx;
+
+                  ctx.fillRect(center_x - bar_width / 2, p.canvasy,
+                      bar_width, y_bottom - p.canvasy);
+
+                  ctx.strokeRect(center_x - bar_width / 2, p.canvasy,
+                      bar_width, y_bottom - p.canvasy);
+                }
+              }
+
+
+            function updatePlot(numDataPoints) {
+                
+                
+
+                if (mobiledetect()) {
+                    modelSelect = {};
+
+                } else {
+                    modelSelect = Dygraph.defaultInteractionModel;
+                }
+
+                gws = new Dygraph(
+                    document.getElementById("WindSpeedChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=windSpd", {
+
+                        labelsSeparateLines: true,
+                        // colorValue: 1,
+                        // legend: "follow",
+                        showRangeSelector: true,
+                        interactionModel: modelSelect,
+                        title: "Wind Speed (MPH)",
+                        ylabel: "Wind Speed (MPH)",
+                        underlayCallback: function(ctx, area, g) {
+
+                            var LowCoords = g.toDomCoords(0, 9);
+                            var HighCoords = g.toDomCoords(0, 16);
+
+                            var high = HighCoords[1];
+                            var low = LowCoords[1];
+                            ctx.beginPath();
+
+                            ctx.setLineDash([5, 15]);
+                            ctx.moveTo(0, low);
+                            ctx.lineTo(10000, low);
+                            ctx.strokeStyle = 'red';
+                            ctx.stroke();
+                            ctx.moveTo(0, high);
+                            ctx.lineTo(10000, high);
+                            ctx.strokeStyle = 'red';
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+
+                        },
+
+                        series: {
+                            'Wind Speed': {
+                                color: 'green',
+                                fillGraph: true,
+                                strokeWidth: 1.0,
+                                drawPoints: true,
+                                pointSize: 2,
+                                highlightCircleSize: 6
+                            },
+                            'Gust': {
+                                color: 'black',
+                                fillGraph: true,
+                                strokeWidth: 0.5,
+                                drawPoints: false,
+                                pointSize: 1.5
+                            }
+                        }
+                    });
+
+
+                /*    gws = new Dygraph(
+                          document.getElementById("WindSpeedChart"),
+                          "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=windSpd",
+                          { 
+                              fillGraph: true,
+                              color: c("green","red"),
+                              colorValue: 1,
+                              showRangeSelector: true,
+                              interactionModel: modelSelect,
+                              title: "Wind Speed (MPH)",
+                              ylabel: "Wind Speed (MPH)", 
+                          });
+                          
+
+                          window.intervalId = setInterval(
+                          function(){
+                              var extents = gws.yAxisRange();
+                              var lowerExtent = extents[0];
+                              var upperExtent = extents[1];
+
+                              if(upperExtent > 60){
+                                  var range = [lowerExtent, 60];
+                                  gws.updateOptions({'valueRange': range});
+                                  }   
+                              },
+                               500
+                              );
+                      
+                   ggm = new Dygraph(
+                          document.getElementById("GustMaxChart"),
+                          "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=gust",
+                          { 
+                              fillGraph: false,
+                              color: 'red',
+                              colorValue: 1,
+                              strokeWidth: 0,
+                              drawPoints: true,
+                              pointSize: 3,
+                              showRangeSelector: true,
+                              interactionModel: modelSelect,
+                              title: "Gust Max (mph)",
+                              ylabel: "Gust Max (mph)", 
+                          });
+
+                      */
+                
+
+                gwd = new Dygraph(
+                    document.getElementById("WindDirectionChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=windDir", {
+                        fillGraph: false,
+                        color: 'red',
+                        colorValue: 1,
+                        strokeWidth: 0,
+                        drawPoints: true,
+                        pointSize: 3,
+                        valueRange: [0, 360],
+                        showRangeSelector: true,
+                        interactionModel: modelSelect,
+                        title: "Wind Direction(deg)",
+                        ylabel: "Wind Direction (deg)",
+                        underlayCallback: function(ctx, area, g) {
+                            var widthOne       = g.toDomYCoord(0) -g.toDomYCoord(1);
+                            var LowCoordsGood  = g.toDomYCoord(1);
+                            var HighCoordsGood = g.toDomYCoord(12);
+                            var LowCoordsOK    = g.toDomYCoord(9);
+                            var HighCoordsOK   = g.toDomYCoord(13);
+  
+                            ctx.fillStyle = "rgba(255, 255, 102, .50)";
+                            ctx.fillRect(0, LowCoordsOK/3.5, 2000, 55);
+
+                            ctx.fillStyle = "rgba(0, 255, 0, .50)";
+                            //              x       y   area x            area y
+                            ctx.fillRect(0, LowCoordsOK/3.25, 2000, 30);
+     
+
+                            //ctx.fillStyle = "rgba(255, 255, 102, .50)";
+                            //           x   y   size x  size y
+                        //    ctx.fillRect(0, 45, 1000, 70);
+
+                         //   ctx.fillStyle = "rgba(0, 255, 0, .50)";
+                         //   ctx.fillRect(0, 65, 1000, 25);
+                        },
+                        axes: {
+                            y: {
+                                ticker: function(min, max, pixels, opts, dygraph, vals) {
+                                    return [{v: 0, label: "N"},
+                                            //  {v:22.5, label:"NNE"},
+                                            {v: 45,label: "NE"},
+                                            //  {v:67.5, label:"ENE"},
+                                            {v: 90,label: "E"},
+                                            //  {v:112.5, label:"ESE"},
+                                            {v: 135,label: "SE"},
+                                            //   {v:157.5, label:"SSE"},
+                                            {v: 180,label: "S"},
+                                            //   {v:202.5, label:"SSW"},
+                                            {v: 225,label: "SW"},
+                                            //   {v:247.5, label:"WSW"},
+                                            {v: 270,label: "W"},
+                                            //  {v:292.5, label:"WNW"},
+                                            {v: 315,label: "NW"},
+                                            //  {v:337.5, label:"NNW"}
+                                            {v: 359,label: "N"},
+                                    ];
+                                }
+                            }
+                        }
+
+                    });
+                 gwh = new Dygraph(
+                    document.getElementById("WindHistChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=windDirHist", {
+                      //  fillGraph: false,
+                       color: 'red',
+                        includeZero: true,
+                        colorValue: 0.5,
+                         plotter: barChartPlotter,
+                        //    rollPeriod: 7,
+                        //   showRoller: true,
+                        showRangeSelector: true,
+                        xRangePad: 50,
+                        interactionModel: modelSelect,
+                        title: "Wind Histogram" + " (past " + numDataPoints + "h)",
+                        ylabel: "Bins",
+                        underlayCallback: function(ctx, area, g) {
+
+                            var widthOne       = g.toDomXCoord(1) -g.toDomXCoord(0);
+                            var LowCoordsGood  = g.toDomXCoord(11);
+                            var HighCoordsGood = g.toDomXCoord(12);
+                            var LowCoordsOK    = g.toDomXCoord(9);
+                            var HighCoordsOK   = g.toDomXCoord(13);
+  
+                            ctx.fillStyle = "rgba(255, 255, 102, .50)";
+                            ctx.fillRect(LowCoordsOK, 0, HighCoordsOK-LowCoordsOK, 2000);
+
+                            ctx.fillStyle = "rgba(0, 255, 0, .50)";
+                            //              x       y   area x            area y
+                            ctx.fillRect(LowCoordsGood, 0, HighCoordsGood-LowCoordsGood+widthOne/2, 2000);
+                        },
+                         axes: {
+                            x: {
+                              //  valueRange: [0, 15],
+                                ticker: function(min, max, pixels, opts, dygraph, vals) {
+                                    return [{v: 0, label: "N" },
+                                            {v: 1, label:"NNE"},
+                                            {v: 2, label: "NE"},
+                                            {v: 3, label:"ENE"},
+                                            {v: 4, label: "E" },
+                                            {v: 5, label:"ESE"},
+                                            {v: 6, label: "SE"},
+                                            {v: 7, label:"SSE"},
+                                            {v: 8, label: "S" },
+                                            {v: 9, label:"SSW"},
+                                            {v:10, label: "SW"},
+                                            {v:11, label:"WSW"},
+                                            {v:12, label: "W" },
+                                            {v:13, label:"WNW"},
+                                            {v:14, label: "NW"},
+                                            {v:15, label:"NNW"},
+                                            {v:16, label: "N" },
+                                    ];
+                                }
+                            }
+                         }
+                      });
+                    
+                gt = new Dygraph(
+                    document.getElementById("TemperatureChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=temp", {
+                        fillGraph: true,
+                        color: 'blue',
+                        colorValue: 0.5,
+                        rollPeriod: 3,
+                        //showRoller: true,
+                        showRangeSelector: true,
+                        interactionModel: modelSelect,
+                        title: "Temperature (deg)",
+                        ylabel: "Temperature (deg)",
+                    });
+                gp = new Dygraph(
+                    document.getElementById("PressureChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=press", {
+                        fillGraph: false,
+                        color: 'violet',
+                        colorValue: 1,
+                        strokeWidth: 2,
+                        rollPeriod: 3,
+                        showRangeSelector: true,
+                        interactionModel: modelSelect,
+                        title: "Standard Pressure (hPa)",
+                        ylabel: "Standard Pressure (hPa)",
+                    });
+                gh = new Dygraph(
+                    document.getElementById("HumidityChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=&type=humid", {
+                        fillGraph: true,
+                        color: 'orange',
+                        strokeWidth: 0,
+                        drawPoints: true,
+                        pointSize: 2,
+                        rollPeriod: 3,
+                        interactionModel: modelSelect,
+                        showRangeSelector: true,
+                        title: "Humidity (%)",
+                        ylabel: "Humidity (%)",
+                    });
+                gbp = new Dygraph(
+                    document.getElementById("BatteryPChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=batt", {
+                        color: 'purple',
+                        fillGraph: true,
+                        rollPeriod: 3,
+                        strokeWidth: 2,
+                        interactionModel: modelSelect,
+                        showRangeSelector: true,
+                        title: "Battery (%)",
+                        ylabel: "Battery (%)",
+                    });
+                gbv = new Dygraph(
+                    document.getElementById("BatteryVChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=battV", {
+                        color: 'purple',
+                        fillGraph: true,
+                        strokeWidth: 2,
+                        pointSize: 1,
+                        rollPeriod: 3,
+                        interactionModel: modelSelect,
+                        showRangeSelector: true,
+                        title: "Battery (V)",
+                        ylabel: "Battery (V)",
+                    });
+                grs = new Dygraph(
+                    document.getElementById("RSSIChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=rssi", {
+                        color: 'gray',
+                        fillGraph: true,
+                        strokeWidth: 0,
+                        drawPoints: true,
+                        interactionModel: modelSelect,
+                        showRangeSelector: true,
+                        title: "RSSI [0-31]",
+                        ylabel: "RSSI",
+                    });
+                glp = new Dygraph(
+                    document.getElementById("LowPowerModeChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=lpm", {
+                        color: 'black',
+                        fillGraph: true,
+                        strokeWidth: 0,
+                        drawPoints: true,
+                        interactionModel: modelSelect,
+                        showRangeSelector: true,
+                        title: "Low Power Mode Enable",
+                        ylabel: "LPM",
+                    });
+                gnr = new Dygraph(
+                    document.getElementById("NumResetChart"),
+                    "getSqlTime.php?hours=" + numDataPoints + "&days=" + 0 + "&type=reset", {
+                        color: 'black',
+                        fillGraph: true,
+                        strokeWidth: 0,
+                        drawPoints: true,
+                        interactionModel: modelSelect,
+                        showRangeSelector: true,
+                        title: "Number of Resets",
+                        ylabel: "Resets",
+                    });
+                
+                devModeEn(1);
+            }
+
+        </script>
+    </body>
+
+</html>

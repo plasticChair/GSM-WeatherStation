@@ -1,0 +1,182 @@
+@import "bourbon/bourbon";
+
+body,
+html {
+  height: 100%;
+  width: 100%;
+  background: lightblue;
+}
+
+body {
+  display: -webkit-box;
+  display: -moz-box;
+  display: box;
+  display: -moz-flex;
+  display: flex;
+  box-align: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  -o-align-items: center;
+  align-items: center;
+  -ms-flex-align: center;
+  box-pack: center;
+  -moz-justify-content: center;
+  -ms-justify-content: center;
+  -o-justify-content: center;
+  justify-content: center;
+  -ms-flex-pack: center;
+  width: 100vw;
+  height: 100vh;
+  background-image: linear-gradient(to bottom, #c9dbe9 0%, #ffffff 100%);
+  z-index: 0;
+  overflow: hidden;
+}
+
+.caixa {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  height: 300px;
+  width: 300px;
+  margin-top: -150px;
+  margin-left: -150px;
+  -webkit-animation-name: cataVento;
+          animation-name: cataVento;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-duration: 400ms;
+          animation-duration: 400ms;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  background: url("http://www.cataventofotografia.com.br/wp-content/uploads/2015/11/logo-g.png") center center no-repeat;
+  background-size: 100%;
+  z-index: 500;
+  position: relative;
+}
+
+i {
+  z-index: 1;
+  background: brown;
+  content: "";
+  -webkit-animation-name: none;
+          animation-name: none;
+  position: absolute;
+  bottom: 0;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 50vh;
+  display: block;
+}
+
+@-webkit-keyframes cataVento {
+  from {
+    -webkit-transform: rotateZ(0deg);
+            transform: rotateZ(0deg);
+  }
+  to {
+    -webkit-transform: rotateZ(-360deg);
+            transform: rotateZ(-360deg);
+  }
+}
+
+@keyframes cataVento {
+  from {
+    -webkit-transform: rotateZ(0deg);
+            transform: rotateZ(0deg);
+  }
+  to {
+    -webkit-transform: rotateZ(-360deg);
+            transform: rotateZ(-360deg);
+  }
+}
+.nuvem {
+  width: 200px;
+  height: 60px;
+  background: #fff;
+  border-radius: 200px;
+  position: relative;
+}
+
+.nuvem:before,
+.nuvem:after {
+  content: '';
+  position: absolute;
+  background: #fff;
+  width: 100px;
+  height: 80px;
+  position: absolute;
+  top: -15px;
+  left: 10px;
+  border-radius: 100px;
+  -webkit-transform: rotate(30deg);
+          transform: rotate(30deg);
+}
+
+.nuvem:after {
+  width: 120px;
+  height: 120px;
+  top: -55px;
+  left: auto;
+  right: 15px;
+}
+
+.nuvem-1 {
+  -webkit-animation: move-nuvem 15s linear infinite;
+          animation: move-nuvem 15s linear infinite;
+}
+
+.nuvem-2 {
+  left: 200px;
+  opacity: 0.6;
+  -webkit-animation: move-nuvem 25s linear infinite;
+          animation: move-nuvem 25s linear infinite;
+}
+
+.nuvem-3 {
+  left: -250px;
+  top: -200px;
+  -webkit-transform: scale(0.8);
+          transform: scale(0.8);
+  opacity: 0.8;
+  -webkit-animation: move-nuvem 20s linear infinite;
+          animation: move-nuvem 20s linear infinite;
+}
+
+.nuvem-4 {
+  left: 470px;
+  top: -250px;
+  -webkit-transform: scale(0.75);
+          transform: scale(0.75);
+  opacity: 0.75;
+  -webkit-animation: move-nuvem 18s linear infinite;
+          animation: move-nuvem 18s linear infinite;
+}
+
+.nuvem-5 {
+  left: -150px;
+  top: -150px;
+  -webkit-transform: scale(0.8);
+          transform: scale(0.8);
+  opacity: 0.8;
+  -webkit-animation: move-nuvem 20s linear infinite;
+          animation: move-nuvem 20s linear infinite;
+}
+
+@-webkit-keyframes move-nuvem {
+  from {
+    margin-left: 1000px;
+  }
+  to {
+    margin-left: -1000px;
+  }
+}
+
+@keyframes move-nuvem {
+  from {
+    margin-left: 1000px;
+  }
+  to {
+    margin-left: -1000px;
+  }
+}
