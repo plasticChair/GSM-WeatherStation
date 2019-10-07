@@ -21,7 +21,7 @@ void buildJSON_man();
 void buildJSON();
 void copyB(char *src, int len);
 void getSignalStrength();
-void setFromGSMTime();
+bool setFromGSMTime();
 bool sendToServer(bool findIPFlag);
 bool sendToServer2(bool findIPFlag);
 bool getRequest();

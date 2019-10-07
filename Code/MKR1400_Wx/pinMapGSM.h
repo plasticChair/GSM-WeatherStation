@@ -21,6 +21,8 @@
 #define I2C_SCL 12
 #define I2C_SDA 11
 
+#define CHARGE_EN A2
+
 
 #endif
 

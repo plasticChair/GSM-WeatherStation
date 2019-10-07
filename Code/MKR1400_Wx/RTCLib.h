@@ -25,9 +25,9 @@ void rtcSetup()
 
 	rtcTime.currTime.sec = 5;
 	rtcTime.currTime.min = 58;
-	rtcTime.currTime.hour = 22;
-	rtcTime.currTime.day = 1;
-	rtcTime.currTime.month = 1;
+	rtcTime.currTime.hour = 6;
+	rtcTime.currTime.day = 26;
+	rtcTime.currTime.month = 5;
 	rtcTime.currTime.year = 1;
 
 	rtc.begin(); //Start RTC library, this is where the clock source is initialized

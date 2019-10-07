@@ -37,10 +37,12 @@ void setup_fram();
 
 void GPIOSetup()
 {
+	
 	Serial1.begin(115200);
 	while (!Serial1);
 	SerialGSM.begin(38400);
 	while (!SerialGSM);
+	USBDevice.detach();
 		
 	pinMode(GPLED1, OUTPUT);
 	pinMode(GPLED2, OUTPUT);
@@ -49,7 +51,7 @@ void GPIOSetup()
 	pinMode(ANE_PULSE, INPUT);
 	pinMode(DONE, OUTPUT);
 	pinMode(WAKE, INPUT);
-	pinMode(BATT_ALRT, INPUT);
+	pinMode(BATT_ALRT, INPUT_PULLUP);
 	pinMode(GSM_RESETN, OUTPUT);
 	
 	//attachInterrupt(digitalPinToInterrupt(BATT_ALRT), lowPowerISR, FALLING);
@@ -61,7 +63,7 @@ void GPIOSetup()
 		pinMode(10, INPUT_PULLUP);
 
 
-		pinMode(A0, INPUT_PULLUP);
+pinMode(A0, INPUT_PULLUP);
 		pinMode(A2, INPUT_PULLUP);
 		pinMode(A3, INPUT_PULLUP);
 		pinMode(A4, INPUT_PULLUP);
@@ -77,7 +79,7 @@ void GPIOSetup()
 		digitalWrite(ANE_Vcc_EN, true);
 		digitalWrite(DONE, LOW);
 		
-	
+	/*
 		digitalWrite(2,HIGH);
 		
 		digitalWrite(7,HIGH);
@@ -88,10 +90,10 @@ void GPIOSetup()
 
 		digitalWrite(A0,HIGH);
 		digitalWrite(A2,HIGH);
-		digitalWrite(A3,HIGH);
+	digitalWrite(A3,HIGH);
 		digitalWrite(A4,HIGH);
 	
-		
+		*/
 	}
 
 void GPIO_dance()
@@ -160,7 +162,7 @@ void setup_fram()
 void setup_battMang()
 {
 	pwr_mgmt.attatch(Wire);
-	pwr_mgmt.quickStart();
+//	pwr_mgmt.quickStart();
 	//pwr_mgmt.vAlertMinThreshold(LOWPOWER_LIMIT);
 	//pwr_mgmt.enSleep(true);
 

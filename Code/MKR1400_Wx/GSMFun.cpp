@@ -2,6 +2,15 @@
 #include "arduino_secrets.h"
 #include "GlobalTypes.h"
 
+#include <TimeLib.h>
+
+extern int hour(time_t t);
+extern int minute(time_t t);
+extern int second(time_t t);
+extern int day(time_t t);
+extern int month(time_t t);
+extern int year(time_t t);
+
 #define TINY_GSM_MODEM_UBLOX
 #include <TinyGsmClient.h>
 #include <ArduinoHttpClient.h>
@@ -9,6 +18,7 @@
 #include "Adafruit_FRAM_I2C.h"
 #include <StreamDebugger.h>
 #include <RTCZero.h>
+
 #define SerialMon Serial1
 
 // Use Hardware Serial on Mega, Leonardo, Micro
@@ -26,14 +36,19 @@ extern storeDataUnion   MstrData;
 extern Adafruit_FRAM_I2C fram;
 
 extern void saveData();
+extern int framRead16(int addr);
+extern int framWrite16(int addr, int val);
 extern volatile CntrlStruct   MstrCntrl;
 extern volatile RTCStruct    rtcTime;
 extern uint32_t measTime_SeverTx;
+extern void framTimeRead2(struct tm *timeptr);
 
 GSMScanner scannerNetworks;
-extern char JSONArray[2+(10+wxPackageSize*2)*200-1];
-extern char preJSONArray[200][(wxPackageSize+2)*2];
-extern char JSONDataStr[2+(10+wxPackageSize*2)*200-1 +  200*2];
+//extern char JSONArray[2+(10+wxPackageSize*2)*500-1];
+extern char JSONArray[2+(10+wxPackageSize*2)*jsonBufferSize];
+//extern char preJSONArray[500][(wxPackageSize+2)*2];
+extern char preJSONArray[jsonBufferSize][(wxPackageSize*2+4)];
+//extern char JSONDataStr[2+(10+wxPackageSize*2)*500-1 +  500*2];
 extern void GSM_Disable();
 extern void GSM_Enable();
 extern void rtcSetGSMTime(time_t now);
@@ -54,7 +69,7 @@ TinyGsm modem(SerialAT);
 TinyGsmClient client2(modem);
 HttpClient http(client2, server, port);
 
-const char apn[]  = "pwg";
+const char apn[]  = "prodata";
 const char user[] = "";
 const char pass[] = "";
 
@@ -63,10 +78,9 @@ const char pass[] = "";
 bool getRequest()
 {
 	// Make GET request to port 80
-	Serial1.print("server default is:  ");
+	Serial1.print(F("server default is:  "));
 	Serial1.println(server);
 	if (client2.connect(server, PORT_SERVER)){
-		Serial1.println("connected");
 		client2.print("GET ");
 		client2.print("/getIP.php?d=123123");
 		client2.println(" HTTP/1.1");
@@ -74,11 +88,12 @@ bool getRequest()
 		client2.println(server);
 		//client2.println("Connection: close");
 		client2.println();
+		Serial1.println("connected");
 		return true;
 	}
 	else {
 		// if you didn't get a connection to the server:
-		Serial1.println("connection failed find");
+		Serial1.println(F("connection failed find"));
 		return false;
 	}
 	
@@ -106,7 +121,7 @@ bool findIP(char *server, char *serverIP, int port) {
 	}
 	
 	
-	Serial1.println("IP config response read");
+	Serial1.println(F("IP config response read"));
 	// Parse response
 	while (connected) {
 		if (client2.available() && foundData) {
@@ -116,7 +131,7 @@ bool findIP(char *server, char *serverIP, int port) {
 			// Shift buffer and append right justified
 			memmove(buff, &(buff[1]), strlen(&(buff[1])));
 			buff[12] = c;
-			Serial1.println(buff);
+
 
 			// Step 5 - Done
 			if (PortFind & (c == '/' )){
@@ -383,6 +398,8 @@ bool readGPRSResponse()
 	
 	if(stsVal_int != 0x84){
 		Serial1.println("----------Bad Status");
+		fram.write8(FRAM_DATA_ERR_CNT_Addr, fram.read8(FRAM_DATA_ERR_CNT_Addr)+1);
+		
 		return false;
 	}
 	
@@ -408,13 +425,18 @@ bool readGPRSResponse()
 
 void buildJSON()
 {
+	char format[128];
+	sprintf(format, "%%.%dX", 2);
+	char tempStrFull[wxPackageSize*2+4];
 	char tempStr[3];
 	const char hex[] = "0123456789abcdef";
 	int payloadSize = 0;
 	int startIdx = 0;
+	int temp = 0;
 
-	startIdx = fram.read8(FRAM_MEM_POINTER_Addr);
-
+	startIdx = framRead16(FRAM_MEM_POINTER_Addr);
+	Serial1.print("STart IDX :    ");
+	Serial1.println(startIdx);
 	
 	if((MstrCntrl.FRAM_NumPoints-startIdx) >= MAX_TX_SIZE){
 		payloadSize = MAX_TX_SIZE;
@@ -427,26 +449,53 @@ void buildJSON()
 	if(MstrCntrl.FRAM_CurrIdx == MstrCntrl.FRAM_NumPoints)
 		MstrCntrl.ServerTxDone = true;
 	
-	strcpy(JSONDataStr,"{");
-		for (int ii = startIdx; ii< (startIdx+payloadSize); ii++){
-			strcat(JSONDataStr, "\"");
-			sprintf(tempStr,"d%02d",ii);
-			strcat(JSONDataStr, tempStr);
-			strcat(JSONDataStr, "\"");
-			strcat(JSONDataStr, ": ");
-			strcat(JSONDataStr, "\"");
-			strcat(JSONDataStr, preJSONArray[ii]);
-			strcat(JSONDataStr, "\"");
+		Serial1.print("payloadSize :    ");
+		Serial1.println(payloadSize);
+		
+	tempStr[0]   = 0;
+	JSONArray[0] = 0;
+	tempStrFull[0] = 0;
+	strcpy(JSONArray,"{");
+
+	for (int kk = 0; kk< (payloadSize); kk++){
 			
-			if (ii < (startIdx+payloadSize-1)){
-				strcat(JSONDataStr, ", ");
-			}
+		//Serial1.print("int bytes - ");
+	//	for (int ii = wxPackageSize-1; ii > 0; --ii) {
+				for (int ii = 0; ii <= wxPackageSize-1; ii++) {
+		//	Serial1.print("Mem Idx : ");
+		//	Serial1.println((startIdx+kk)*FRAM_DATA_OFFSET + FRAM_CNTRL_OFFSET + ii);
+			temp = fram.read8((startIdx+kk)*FRAM_DATA_OFFSET + FRAM_CNTRL_OFFSET + ii);
+			//Serial1.print(temp);
+			sprintf(tempStr, format, temp);
+		//	Serial1.print(tempStr);
+			strcat(tempStrFull, tempStr);
 		}
-	strcat(JSONDataStr, "}");
-	strcat(JSONDataStr, "\0");
+	//	Serial1.println("");
+		strcat(tempStrFull, "\0");
+		Serial1.print("full:       ");
+		Serial1.println(tempStrFull);
+			
+		strcat(JSONArray, "\"");
+		sprintf(tempStr,"d%02d",kk);
+		strcat(JSONArray, tempStr);
+		strcat(JSONArray, "\"");
+		strcat(JSONArray, ": ");
+		strcat(JSONArray, "\"");
+		strcat(JSONArray, tempStrFull);
+		strcat(JSONArray, "\"");
+			
+		if (kk < (payloadSize-1)){
+			strcat(JSONArray, ", ");
+		}
+		tempStrFull[0] = 0;
+		Serial1.println("");
+	}
+	strcat(JSONArray, "}");
+	strcat(JSONArray, "\0");
 	Serial1.print("true data - ");
-	Serial1.println(JSONDataStr);
-	strcpy(JSONArray,JSONDataStr);
+	Serial1.println(JSONArray);
+	delay(1);
+	//strcpy(JSONArray,JSONDataStr);
 }
 
 
@@ -460,12 +509,27 @@ void getSignalStrength()
 	Serial1.println(" [0-31]");
 }
 
-void setFromGSMTime()
+bool setFromGSMTime()
 {
-	time_t now;
-	now = gsmAccess.getLocalTime();
-
-	rtcSetGSMTime(now);
+	time_t nowT;
+	time_t lastT;
+	struct tm readtime;
+	nowT = gsmAccess.getLocalTime();
+		
+	framTimeRead2(&readtime);
+	readtime.tm_year += 2018;
+	lastT = mktime(&readtime);
+		
+	if (nowT < lastT){
+		Serial1.println("failed time");
+		delay(100);
+		return false;
+	}	
+	else{
+		Serial1.println("success time");
+		rtcSetGSMTime(nowT);
+	}
+	return true;
 
 }
 
@@ -480,29 +544,41 @@ bool sendToServer(bool findIPFlag)
 	int errorCount = 0;
 	int postErrorCount = 0;
 	volatile int  currPoint = 0;
+	bool timeStatus = false;
+	int timeStatusCount = 0;
 	
 	globalStatus = false;
+	
 	#if debug_GSM_EN
 		if (digitalRead(GSM_RESETN)){
 			GSM_Enable();
 			delay(9000);
 		}
 			
-		framReadData();
-		currPoint = fram.read8(FRAM_MEM_POINTER_Addr);
+		//framReadData();
+		MstrCntrl.FRAM_NumPoints = framRead16(FRAM_NUM_P0INTS_Addr);
+		currPoint = framRead16(FRAM_MEM_POINTER_Addr);
+		
 		if(MstrCntrl.FRAM_NumPoints > 0  ) sendDataFlag = true;
 		else MstrCntrl.ServerTxDone = true;
 		
-		Serial1.print("num points pointer: -------");
+		Serial1.print("num points pointer: ");
 		Serial1.println(MstrCntrl.FRAM_NumPoints);
+		
 		if ((currPoint >= MstrCntrl.FRAM_NumPoints) && sendDataFlag){
 			sendDataFlag = false;
 			MstrCntrl.ServerTxDone = true;
-			fram.write8(FRAM_MEM_POINTER_Addr, 0);
+			framWrite16(FRAM_MEM_POINTER_Addr, 0);
 			Serial1.println("reset pointer");
 		}
 		Serial1.print(" pointer:   ");
-		Serial1.println(fram.read8(FRAM_MEM_POINTER_Addr));
+		Serial1.println(currPoint);
+		
+		
+		if (MstrCntrl.FRAM_NumPoints >= 92 ) resetWatchDog();
+		
+	//	buildJSON();
+		//delay(10000000);
 	
 		enum StateDef {ConnectingState = 0, findIPState = 1, updateTimeSignalState = 3, sendPostState = 4, readState = 5, eraseData = 6, connFail = 7};
 		enum StateDef State = ConnectingState;
@@ -523,13 +599,23 @@ bool sendToServer(bool findIPFlag)
 					break;
 				
 				case updateTimeSignalState:
-				//	getSignalStrength();
-				//	setFromGSMTime();
-					if (sendDataFlag) State = sendPostState;
-					else State = eraseData;
-					break;
+					getSignalStrength();
+					timeStatus = setFromGSMTime();
+					if (timeStatus){
+						if (sendDataFlag) State = sendPostState;
+						else State = eraseData;
+						break;
+					}
+					else {
+						timeStatusCount++;
+						if (timeStatusCount >3)
+							State = connFail;
+						
+						break;						
+					}
 				
 				case sendPostState:
+					Serial1.println("Build Jason---------------");
 					buildJSON();
 					delay(50);
 					status = sendPost(JSONArray);
@@ -546,7 +632,7 @@ bool sendToServer(bool findIPFlag)
 				    delay(200);
 					gsmTxStatus = readGPRSResponse();
 					if (gsmTxStatus){
-						fram.write8(FRAM_MEM_POINTER_Addr, MstrCntrl.FRAM_CurrIdx);
+						framWrite16(FRAM_MEM_POINTER_Addr, MstrCntrl.FRAM_CurrIdx);
 						if(MstrCntrl.ServerTxDone)	State = eraseData;
 						else State = sendPostState;
 					}
@@ -558,8 +644,8 @@ bool sendToServer(bool findIPFlag)
 					GPIO_dance();
 					GPIO_dance();
 					GPIO_dance();
-					fram.write8(FRAM_NUM_P0INTS_Addr, 0);
-					fram.write8(FRAM_MEM_POINTER_Addr, 0);
+					framWrite16(FRAM_NUM_P0INTS_Addr, 0);
+					framWrite16(FRAM_MEM_POINTER_Addr, 0);
 					errorCount = 99;//Done
 					globalStatus = true;
 					MstrCntrl.ServerTxDone = false;
@@ -568,7 +654,16 @@ bool sendToServer(bool findIPFlag)
 				case connFail:
 					client2.stop();
 					modem.gprsDisconnect();
+					GSM_Disable();
+					delay(250);
+					GSM_Enable();
+					delay(250);
 					State = ConnectingState;
+					if (fram.read8(FRAM_ERR_CNT_Addr) < 5){
+						fram.write8(FRAM_ERR_CNT_Addr, fram.read8(FRAM_ERR_CNT_Addr)+1);
+					}
+					
+					break;
 				
 				default:
 					State = ConnectingState;
@@ -580,8 +675,8 @@ bool sendToServer(bool findIPFlag)
 		GPIO_dance();
 		GPIO_dance();
 		globalStatus = true;
-		fram.write8(FRAM_NUM_P0INTS_Addr, 0);
-		fram.write8(FRAM_MEM_POINTER_Addr, 0);
+		framWrite16(FRAM_NUM_P0INTS_Addr, 0);
+		framWrite16(FRAM_MEM_POINTER_Addr, 0);
 	#endif
 	
 				
@@ -598,7 +693,7 @@ bool sendToServer(bool findIPFlag)
 		return true;
 	}
 	else{
-		measTime_SeverTx = (rtcTime.currTime.min + 1) % 60;
+		measTime_SeverTx = (rtcTime.currTime.min + fram.read8(FRAM_ERR_CNT_Addr)) % 60;
 		return false;
 	}
 }

@@ -21,7 +21,7 @@
 #define __SAMD21G18A__
 #define USB_VID 0x2341
 #define USB_PID 0x8052
-#define USBCON
+//#define USBCON
 #define USE_BQ24195L_PMIC
 
 #include "pins_arduino.h" 

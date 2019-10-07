@@ -8,13 +8,13 @@
 	Hardware: Arduino MKR GSM 1400 No BL, Platform=samd, Package=arduino
 */
 
-#define ARDUINO 10806
+#define ARDUINO 10809
 #define ARDUINO_MAIN
 #define F_CPU 48000000L
 #define printf iprintf
 #define __SAMD__
 #define F_CPU 48000000L
-#define ARDUINO 10806
+#define ARDUINO 10809
 #define ARDUINO_SAMD_MKRGSM1400_NoBL
 #define ARDUINO_ARCH_SAMD
 #define USE_ARDUINO_MKR_PIN_LAYOUT
@@ -23,6 +23,15 @@
 #define USB_PID 0x8052
 #define USBCON
 #define USE_BQ24195L_PMIC
+void InitTraceBuffer();
+//
+void pulseISR();
+//
+void rtcISR();
+void TC4_Handler(void);
+void lowPowerISR();
+void watchdogISR();
+void TC3_Handler(void);
 
 #include "pins_arduino.h" 
 #include "variant.h" 

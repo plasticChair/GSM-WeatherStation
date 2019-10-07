@@ -8,11 +8,12 @@
 
 #define MEAS_INTERVAL 30 //seconds
 #define ServerTx_INTERVAL 15 //Minutes
+
 #define ANE_INTERVAL 2 // Seconds
 #define LOWPOWER_LIMIT 3.85 // Volts
-#define LOWPOWER_LLIMIT_PCNT 40 // Volts
-#define LOWPOWER_LIMIT_PCNT 45 // Volts
-#define LOWPOWER_ULIMIT_PCNT 50 // Volts
+#define LOWPOWER_LLIMIT_PCNT 45 // Volts
+#define LOWPOWER_LIMIT_PCNT 40 // Volts
+#define LOWPOWER_ULIMIT_PCNT 55 // Volts
 
 
 #define SLEEP_HOUR 20
@@ -27,7 +28,7 @@
 
 #define wxPackageSize 16
 #define PULSEDT_BUFFLENGTH 32
-
+#define jsonBufferSize 50
 
 #define LED_ON 0
 #define LED_OFF 1
@@ -45,8 +46,10 @@
 #define sec2MPH 60/50.69
 
 #define FRAM_RESET_CNT_Addr  0
-#define FRAM_MEM_POINTER_Addr  3
-#define FRAM_NUM_P0INTS_Addr  1
+#define FRAM_MEM_POINTER_Addr  3 //,3
+#define FRAM_NUM_P0INTS_Addr  1 //,2
+#define FRAM_ERR_CNT_Addr 5
+#define FRAM_DATA_ERR_CNT_Addr 6
 #define FRAM_MEAS_INT_Addr 7
 #define FRAM_LP_MODE_Addr  9
 #define FRAM_TIME_Addr  10

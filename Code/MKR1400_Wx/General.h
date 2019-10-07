@@ -14,9 +14,9 @@
 
 #include "UserParams.h"
 #include "GSMFun.h"
-
-
 #include "pinMapGSM.h"
+#include "time.h"
+
 extern storeDataUnion  MstrData;
 extern BME280 BME;
 extern MAX17048 pwr_mgmt;
@@ -26,7 +26,7 @@ extern volatile CntrlStruct MstrCntrl;
 extern wxSFStruct  wxSF;
 extern volatile pulseStruct pulseData;
 extern volatile RTCStruct rtcTime;
-extern char preJSONArray[200][(wxPackageSize+2)*2];
+extern char preJSONArray[jsonBufferSize][(wxPackageSize*2+4)];
 extern LaCrosse_TX23     anemometer;
 
 extern int LPMCounter;
@@ -99,6 +99,8 @@ void enterSleep()
 {
 	__DSB(); // Complete any pending buffer writes.
 	SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+	//SCB->SCR = SCB_SCR_SLEEPDEEP_Msk;
+	//PM->SLEEP.bit.IDLE = 0x02;
 	__WFI();
 }
 
@@ -184,21 +186,36 @@ void saveData()
 	Serial1.println("done Save");
 }
 
+int framRead16(int addr)
+{
+	int tempVar = 0;
+	tempVar = fram.read8(addr);
+	tempVar |= fram.read8(addr+1) << 8;
+	
+	return tempVar;
+}
 
+int framWrite16(int addr, int val)
+{
+
+	fram.write8(addr, val & 0xFF);
+	fram.write8(addr+1, (val & 0xFF) >> 8);
+
+}
 
 	
 void framSaveData()
 {
-	MstrCntrl.FRAM_Idx = fram.read8(FRAM_NUM_P0INTS_Addr);
-	//	MstrCntrl.FRAM_Idx != (fram.read8(FRAM_NUM_P0INTS_Addr+1) << 8);
+	MstrCntrl.FRAM_Idx = framRead16(FRAM_NUM_P0INTS_Addr);
+	//	MstrCntrl.FRAM_Idx != (framRead16(FRAM_NUM_P0INTS_Addr+1) << 8);
 	Serial1.println("Mem pointer: " + String(MstrCntrl.FRAM_Idx));
 
 	for (int ii = wxPackageSize-1; ii >= 0; --ii) {
 		fram.write8(MstrCntrl.FRAM_Idx*FRAM_DATA_OFFSET + FRAM_CNTRL_OFFSET +ii, (MstrData.TxData[ii] >> 4) | (MstrData.TxData[ii] << 4 ));
 	}
 	MstrCntrl.FRAM_Idx++;
-	fram.write8(FRAM_NUM_P0INTS_Addr, MstrCntrl.FRAM_Idx & 0xFF);
-	Serial1.println("done Frame Save");
+	framWrite16(FRAM_NUM_P0INTS_Addr, MstrCntrl.FRAM_Idx);
+	Serial1.println(F("done Frame Save"));
 }
 
 void framReadData()
@@ -213,7 +230,7 @@ void framReadData()
 	int startVal = 0;
 	
 	// Grab Index from memory
-	MstrCntrl.FRAM_NumPoints = fram.read8(FRAM_NUM_P0INTS_Addr);
+	MstrCntrl.FRAM_NumPoints = framRead16(FRAM_NUM_P0INTS_Addr);
 	
 	Serial1.println("Num points pointer: " + String(MstrCntrl.FRAM_NumPoints,HEX));
 
@@ -269,7 +286,7 @@ void collectData()
 	MstrData.weather.second = (uint8_t)(rtcTime.currTime.sec);
 	
 	/*-----Get temp data------*/
-	Serial1.print("Got temps: ");
+	Serial1.print(F("Got temps: "));
 	BME_Force();
 	Serial1.println(sampledData.temp);
 	
@@ -281,26 +298,29 @@ void collectData()
 		failCount++;
 		delay(10);
 	}
-	Serial1.print("Battery data ->");
+	Serial1.print(F("Battery data ->"));
 	Serial1.println(sampledData.batteryP);
 	
 	/* --- Get wind --- */
 	aneErr = anemometer.read(sampledData.speed, sampledData.dir);
 	if (aneErr != 4 || (sampledData.speed > 100)){
-
+		Serial1.println(aneErr);
 		pulseData.RTCFlag = true;
 		delay(2010);
 		aneErr = anemometer.read(sampledData.speed, sampledData.dir);
 		if (aneErr != 4)
 		{
-			Anemometer_Disable();
-			delay(100);
-			Anemometer_Enable();
-		    Serial1.println("wind failed");
+			//Anemometer_Disable();
+		//	delay(200);
+		//	Anemometer_Enable();
+		    Serial1.println(F("wind failed"));
+			Serial.println(aneErr);
 			sampledData.speed = 0;  //Change Me
 			sampledData.dir   = 0;
 		}
 	}
+	
+	Serial1.println(sampledData.speed);
 	
 	/* --- Store data --- */
 	MstrData.weather.LowPwrMode = MstrCntrl.LP_Mode;
@@ -314,7 +334,7 @@ void collectData()
 
 void resetWatchDog()
 {
-	Serial1.println("----RESET WD -----");
+	Serial1.println(F("----RESET WD -----"));
 	digitalWrite(DONE, HIGH);
 	delay(20);
 	digitalWrite(DONE, LOW);
@@ -325,29 +345,29 @@ void resetWatchDog()
 void printCurTime()
 {
 	Serial1.print(rtcTime.currTime.hour);
-	Serial1.print(" Hour : ");
+	Serial1.print(F(" Hour : "));
 	Serial1.print(rtcTime.currTime.min);
-	Serial1.print(" Min : ");
+	Serial1.print(F(" Min : "));
 	Serial1.print(rtcTime.currTime.sec);
-	Serial1.print(" Sec : ");
+	Serial1.print(F(" Sec : "));
 	
 	Serial1.print(rtcTime.currTime.day);
-	Serial1.print(" Day : ");
+	Serial1.print(F(" Day : "));
 	Serial1.print(rtcTime.currTime.month);
-	Serial1.print(" Month : ");
+	Serial1.print(F(" Month : "));
 	Serial1.print(rtcTime.currTime.year);
-	Serial1.println(" Year : ");
+	Serial1.println(F(" Year : "));
 
 }
 
 void LPModeCheck()
 {
-	if (sampledData.batteryP < 15){
+	if (sampledData.batteryP < LOWPOWER_LLIMIT_PCNT){
 			// Double Check
-			if (sampledData.batteryV < 3.75){
+			if (sampledData.batteryV < LOWPOWER_LIMIT){
 			MstrCntrl.LP_Mode = 1;
 			LPMCounter++;
-			Serial1.println("-------------LP mode engaged");
+			Serial1.println(F("-------------LP mode engaged"));
 			}
 	}
 }
@@ -367,11 +387,12 @@ void LPModeCheckStartup()
 		// Double Check
 		if (sampledData.batteryV < LOWPOWER_LIMIT){
 			MstrCntrl.LP_Mode = 1;
-			Serial1.println("-------------LP mode engaged");
+			Serial1.println(F("-------------LP mode engaged - Startup"));
 			fram.write8(FRAM_LP_MODE_Addr, 1);
 			Anemometer_Disable();
 			GSM_Disable();
-			delay(10);
+			delay(100);
+			pwr_mgmt.reset();
 			enterSleep();
 		}
 		}else{
@@ -474,7 +495,7 @@ void framTimeSave()
 	fram.write8(FRAM_TIME_Addr+5,rtcTime.currTime.year);
 	
 	Serial1.println("");
-	Serial1.println("done Frame time save");
+	Serial1.println(F("done Frame time save"));
 }
 
 void framTimeRead()
@@ -486,11 +507,38 @@ void framTimeRead()
 	rtcTime.currTime.month = fram.read8(FRAM_TIME_Addr+4);
 	rtcTime.currTime.year  = fram.read8(FRAM_TIME_Addr+5);
 	
-	Serial1.println("done Frame time read");
+	Serial1.println(F("done Frame time read"));
 }
 
+void framTimeRead2(struct tm *timeptr)
+{
+	timeptr->tm_sec   = fram.read8(FRAM_TIME_Addr);
+	timeptr->tm_min   = fram.read8(FRAM_TIME_Addr+1)+1;
+	timeptr->tm_hour  = fram.read8(FRAM_TIME_Addr+2);
+	timeptr->tm_mday  = fram.read8(FRAM_TIME_Addr+3);
+	timeptr->tm_mon   = fram.read8(FRAM_TIME_Addr+4);
+	timeptr->tm_year  = fram.read8(FRAM_TIME_Addr+5);
 
+	Serial1.println(F("done Frame time read"));
+}
 
+void disableCharge()
+{
+	pinMode(CHARGE_EN, OUTPUT);
+	digitalWrite(CHARGE_EN,HIGH);	
+}
+
+void enableCharge()
+{
+	pinMode(CHARGE_EN, OUTPUT);
+	digitalWrite(CHARGE_EN,LOW);
+}
+
+void battFollowCharge()
+{
+	pinMode(CHARGE_EN, INPUT_PULLDOWN);
+	digitalWrite(CHARGE_EN,LOW);
+}
 
 #endif
 

@@ -22,6 +22,8 @@ typedef struct ControlStruct {
 	
 	uint16_t measInterval;
 	uint16_t serverInterval;
+	uint16_t sleepMeasInterval;
+	uint16_t sleepMeasIntCnt;
 	unsigned int jsonSize;
 
 	// Low Power Mode
@@ -102,8 +104,6 @@ typedef struct wxSFStruct {
 	int   battOff;
 
 };
-
-
 
 typedef union {
 	wxStruct weather;

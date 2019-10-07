@@ -48,9 +48,10 @@ volatile bool sendData_flag  = false;
 volatile bool PulseLed_state = false;
 
 // Server vars
-char preJSONArray[200][(wxPackageSize+2)*2];
-char JSONArray[2+(10+wxPackageSize*2)*200-1 +  200*2];
-char JSONDataStr[2+(10+wxPackageSize*2)*200-1 +  200*2];
+//char preJSONArray[500][wxPackageSize*2+4];
+char preJSONArray[jsonBufferSize][wxPackageSize*2+4];
+char JSONArray[2+(10+wxPackageSize*2)*jsonBufferSize];
+//char JSONDataStr[2+(10+wxPackageSize*2)*500-1 +  500*2];
 uint32_t measTime_SeverTx = ServerTx_INTERVAL;
 
 void pulseISR();

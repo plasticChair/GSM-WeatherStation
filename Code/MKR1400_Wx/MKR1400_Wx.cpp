@@ -19,7 +19,7 @@ Author:     DESKTOP-4LJLPCB\mosta
 #include "MKR1400_Wx.h"
 
 #define debug_GSM_EN 1
-#define debug_Sleep_EN 0
+#define debug_Sleep_EN 1
 
 GSMBand band;
 GSMClient client;
@@ -71,13 +71,14 @@ void setup()
 	/* ----- Init vals ----- */
 	init_vars();
 
+
 	/* ----- GPIOs ----- */
 	GPIOSetup();
 	GPIODefaults();
 
 	
 	GPIO_dance();
-	Serial1.println("*************** Power ON *********************");
+	Serial1.println(F("\r\n*************** Power ON *********************"));
 	
 	/* ----- Extneral WD ----- */
 	resetWatchDog();
@@ -108,21 +109,35 @@ void setup()
 	LPModeCheckStartup();
 		
 	Serial1.println("Setup RTC");
-
+//	framWrite16(FRAM_NUM_P0INTS_Addr, 0);
 	#if debug_GSM_EN
 	//	MODEM.debug();
+		// Rest if too many connection failures
+		if ( fram.read8(FRAM_ERR_CNT_Addr) > 3 ){
+			Serial1.print(" Error Count : ");
+			Serial1.println(fram.read8(FRAM_ERR_CNT_Addr));
+			fram.write8(FRAM_ERR_CNT_Addr, 0);
+			enterSleep();			
+		}
+		// delete memory if too many bad status failures
+		if (fram.read8(FRAM_DATA_ERR_CNT_Addr) > 5){
+			fram.write8(FRAM_DATA_ERR_CNT_Addr,0);
+			fram.write8(FRAM_MEM_POINTER_Addr,0);
+			fram.write8(FRAM_NUM_P0INTS_Addr,0);
+		}
+
 		GSM_Enable();
 		delay(9000);
 		if(sendToServer(true)){
 			Serial1.println("***Sent***");
 		}		
 		else{
-			Serial1.println("*****************RESET**************");
+			Serial1.println(F("*****************RESET**************"));
 			Watchdog.enable(1000);
 			delay(2000);
 		}
 	#else
-	fram.write8(FRAM_NUM_P0INTS_Addr, 0);
+	framWrite16(FRAM_NUM_P0INTS_Addr, 0);
 
 	#endif
 //	delay(100000);
@@ -145,7 +160,7 @@ void setup()
 	EIC_Setup();
 	measTime_SeverTx = (rtcTime.currTime.min + MstrCntrl.serverInterval) % 60;
 
-	Serial1.println("Starting ********************************************");
+	Serial1.println(F("Starting ********************************************"));
 
 //	InitTraceBuffer();
 	MstrCntrl.sleepSingle = true;
@@ -215,8 +230,9 @@ void loop()
 		tcReset();
 		rtcISR_flag = 0;
 		MstrCntrl.RTCUpdateFlag = 1;
+		
 		/*-----Notify and reset RTC------*/
-		Serial1.println("Measure sensors ---------------");
+		Serial1.println(F("Measure sensors ---------------"));
 		
 		// Setup RTC
 		rtcSetAlarm(0, MstrCntrl.measInterval);
@@ -227,6 +243,9 @@ void loop()
 		saveData();
 		framSaveData();
 		LPModeCheck();
+		
+		Serial1.print(" Gust  ");
+		Serial1.println(sampledData.gustMax);
 		
 		
 	//	printSampeledData();
@@ -240,24 +259,24 @@ void loop()
 			#endif
 		}
 	
-	if(fram.read8(FRAM_NUM_P0INTS_Addr) > 60){
-		maxDataSend = 1;
-		sendData_flag = true;
-	}
+		if(framRead16(FRAM_NUM_P0INTS_Addr) > 250){
+			maxDataSend = 1;
+			sendData_flag = true;
+		}
 	
-	if ((rtcTime.currTime.hour > MstrCntrl.sCmd_t_hours+1)  && (rtcTime.currTime.min > MstrCntrl.sCmd_t_mins)){
-		MstrCntrl.serverInterval = ServerTx_INTERVAL;
-	}
+		if ((rtcTime.currTime.hour > MstrCntrl.sCmd_t_hours+1)  && (rtcTime.currTime.min > MstrCntrl.sCmd_t_mins)){
+			MstrCntrl.serverInterval = ServerTx_INTERVAL;
+		}
 
 
 		//Check night time, if between hours of sleep and be sure this only happens once
-		if (((rtcTime.currTime.hour >= MstrCntrl.sleepHour) || (rtcTime.currTime.hour <= MstrCntrl.wakeupHour)) && MstrCntrl.sleepSingle  && debug_Sleep_EN){
-			Serial1.println("----------------- Sleep En --------------------------");
+		if (((rtcTime.currTime.hour >= MstrCntrl.sleepHour) || (rtcTime.currTime.hour < MstrCntrl.wakeupHour)) && MstrCntrl.sleepSingle  && debug_Sleep_EN){
+			Serial1.println(F("----------------- Sleep En --------------------------"));
 			printCurTime();
 			MstrCntrl.sleepModeEn = true;
 			MstrCntrl.sleepModeSet = true;
 			measTime_SeverTx = rtcTime.currTime.min;
-			sendData_flag = true;
+			if ( framRead16(FRAM_NUM_P0INTS_Addr) > 5)	sendData_flag = true;
 		}
 
 		resetWatchDog();
@@ -276,7 +295,7 @@ void loop()
 	if (((rtcTime.currTime.min >= measTime_SeverTx)|| (maxDataSend)) && sendData_flag) {
 		
 		updateFlag = 1;
-		Serial1.println("Send data to Server**************************************");
+		Serial1.println(F("Send data to Server**************************************"));
 		rtcDisable();
 		sendData_flag = 0;
 		
@@ -285,7 +304,9 @@ void loop()
 		framTimeSave();
 		
 		//Send Data
-		sendToServer(false);
+		#if debug_GSM_EN
+			sendToServer(false);
+		#endif
 	
 		resetWatchDog();
 		rtcEnable();
@@ -330,25 +351,11 @@ void loop()
 		updateFlag = 1;
 		MstrCntrl.sleepModeEn = false;
 		MstrCntrl.sleepSingle = false;
-		Serial1.println("----------------- Wake up from Sleep ----------------");
-			printCurTime();
-			Serial1.println("**********RESET**********");
-			Watchdog.enable(1000);
-			delay(2000);
-		/*#if debug_GSM_EN
-			GSM_Enable();
-			delay(8000);
-			
-			sendToServer(true);
-			
-		#endif
-		rtcUpdateTime();
-		Anemometer_Enable();
-		rtcSetAlarm(0, MstrCntrl.measInterval);
-		measTime_SeverTx = (rtcTime.currTime.min + MstrCntrl.serverInterval) % 60;
-		tcReset();
-		attachInterrupt(digitalPinToInterrupt(ANE_PULSE), pulseISR, FALLING);
-		*/
+		Serial1.println(F("----------------- Wake up from Sleep ----------------"));
+		printCurTime();
+		Serial1.println(F("**********RESET**********"));
+		Watchdog.enable(1000);
+		delay(2000);
 	}
 
 	/*---------------------------------------*/
@@ -362,7 +369,7 @@ void loop()
 		//Remove low power mode if > 3.6V
 		if (sampledData.batteryP >= LOWPOWER_ULIMIT_PCNT)
 		{
-			Serial1.println("-----------set LP state OFF");
+			Serial1.println(F("-----------set LP state OFF"));
 			MstrData.weather.LowPwrMode = 0;
 			MstrCntrl.LP_Mode = 0;
 			LPMCounter = 0;
@@ -373,7 +380,7 @@ void loop()
 		if ((sampledData.batteryP <= LOWPOWER_LIMIT_PCNT) && ((LPMCounter) >= (LOWPOWER_ULIMIT_PCNT+5)))
 		{
 			LPMCounter = 0;
-			Serial1.print("------------- set LP state again - ");
+			Serial1.print(F("------------- set LP state again - "));
 			Serial1.println(sampledData.batteryV);
 			Serial1.println(MstrCntrl.measInterval);
 			MstrData.weather.LowPwrMode = 1;
@@ -388,11 +395,12 @@ void loop()
 		digitalWrite(DONE, HIGH);
 		delay(2);
 		digitalWrite(DONE, LOW);
-		Serial1.println("Watch Dog ISR backgound**************************");
+		Serial1.println(F("Watch Dog ISR backgound**************************"));
 		printCurTime();
 		MstrCntrl.WDFlag = false;
 		delay(10);
 		updateFlag = true;
+		MstrCntrl.sleepModeCount++;
 		if (MstrCntrl.sleepModeCount == 4)  Anemometer_Enable();
 	}
 	
