@@ -121,6 +121,8 @@ void getBatteryInfo()
 	sampledData.batteryV = pwr_mgmt.voltage();
 	delay(3);
 	sampledData.batteryP = pwr_mgmt.accuratePercent();
+
+	
 }
 
 unsigned long floatLimit(float *value, float scalefactor, int offset, float max_in, float min_in)
@@ -304,6 +306,7 @@ void collectData()
 	/* --- Get wind --- */
 	aneErr = anemometer.read(sampledData.speed, sampledData.dir);
 	if (aneErr != 4 || (sampledData.speed > 100)){
+		Serial1.print("Wind Error: ");
 		Serial1.println(aneErr);
 		pulseData.RTCFlag = true;
 		delay(2010);

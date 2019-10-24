@@ -450,8 +450,8 @@ void init_vars()
 	serverData.portIP           = PORT_IP;
 	serverData.portServer       = PORT_SERVER;
 	serverData.serverConnection = false;
-	strcpy(serverData.server,"scottn.ddns.net\0");
-	strcpy(serverData.serverIP, "68.230.107.205\0");
+	strcpy(serverData.server,"wxdata.scottnette.com\0");
+	strcpy(serverData.serverIP, "wxdata.scottnette.com\0");
 	strcpy(serverData.path,"/formParse2SQLDB.php\0");
 
 	for (int ii = 0; ii< PULSEDT_BUFFLENGTH; ii++){

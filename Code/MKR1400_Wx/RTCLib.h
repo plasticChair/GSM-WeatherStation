@@ -43,9 +43,15 @@ void rtcSetGSMTime(time_t now)
 		rtc.setTime(hour(now), minute(now), second(now)); //set time
 		rtc.setDate(day(now), month(now), year(now)-34); //set date
 		
+		/*
+		Serial1.println("Just set time to:");
 		Serial1.println(hour(now));
 		Serial1.println(minute(now));
 		Serial1.println(second(now));
+		Serial1.println(month(now));
+		Serial1.println(day(now));
+		Serial1.println(year(now));
+			*/	
 	
 }
 

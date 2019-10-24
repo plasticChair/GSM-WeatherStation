@@ -22,7 +22,7 @@
 //#define SERVER_NAME "scottn.ddns.net"
 //#define SERVER_IP "068.230.107.205"
 //#define PATH "/ardu2SQL.php?"
-#define PORT_IP 5211
+#define PORT_IP 80
 #define PORT_SERVER 80
 
 

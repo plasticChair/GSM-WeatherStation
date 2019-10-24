@@ -134,8 +134,8 @@ typedef struct pulseStruct{
 
 typedef struct serverStruct{
 	// Server Control
-	char server[17];
-	char serverIP[17];
+	char server[26];
+	char serverIP[26];
 	char path[21];
 	int portIP;
 	int portServer;

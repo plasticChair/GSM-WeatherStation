@@ -96,17 +96,6 @@
   <armgcc.compiler.directories.IncludePaths>
     <ListValues>
       <Value>../../../MKR1400_Wx</Value>
-      <Value>E:/Arduino/libraries/MKRGSM/src</Value>
-      <Value>C:/Users/mosta/AppData/Local/arduino15/packages/arduino/hardware/samd/1.6.20/libraries/Wire</Value>
-      <Value>E:/Arduino/libraries/Adafruit_FRAM_I2C-master</Value>
-      <Value>E:/Arduino/libraries/MAX17048-master</Value>
-      <Value>E:/Arduino/libraries/SparkFun_BME280_I2C/src</Value>
-      <Value>E:/Arduino/libraries/RTCZero/src</Value>
-      <Value>E:/Arduino/libraries/Time-master</Value>
-      <Value>E:/Arduino/libraries/Adafruit_SleepyDog-master</Value>
-      <Value>E:/Arduino/libraries/TinyGSM-master/src</Value>
-      <Value>E:/Arduino/libraries/ArduinoHttpClient/src</Value>
-      <Value>E:/Arduino/libraries/StreamDebugger</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries</Value>
       <Value>C:/Users/mosta/AppData/Local/arduino15/packages/arduino/hardware/samd/1.6.20/libraries</Value>
       <Value>E:/Arduino/libraries</Value>
@@ -162,17 +151,6 @@
   <armgcccpp.compiler.directories.IncludePaths>
     <ListValues>
       <Value>../../../MKR1400_Wx</Value>
-      <Value>E:/Arduino/libraries/MKRGSM/src</Value>
-      <Value>C:/Users/mosta/AppData/Local/arduino15/packages/arduino/hardware/samd/1.6.20/libraries/Wire</Value>
-      <Value>E:/Arduino/libraries/Adafruit_FRAM_I2C-master</Value>
-      <Value>E:/Arduino/libraries/MAX17048-master</Value>
-      <Value>E:/Arduino/libraries/SparkFun_BME280_I2C/src</Value>
-      <Value>E:/Arduino/libraries/RTCZero/src</Value>
-      <Value>E:/Arduino/libraries/Time-master</Value>
-      <Value>E:/Arduino/libraries/Adafruit_SleepyDog-master</Value>
-      <Value>E:/Arduino/libraries/TinyGSM-master/src</Value>
-      <Value>E:/Arduino/libraries/ArduinoHttpClient/src</Value>
-      <Value>E:/Arduino/libraries/StreamDebugger</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries</Value>
       <Value>C:/Users/mosta/AppData/Local/arduino15/packages/arduino/hardware/samd/1.6.20/libraries</Value>
       <Value>E:/Arduino/libraries</Value>
@@ -536,17 +514,6 @@ build.path=C:\Users\mosta\AppData\Local\Temp\VMBuilds\MKR1400_Wx\mkrgsm1400\Debu
   <armgcc.compiler.directories.IncludePaths>
     <ListValues>
       <Value>../../../MKR1400_Wx</Value>
-      <Value>E:/Arduino/libraries/MKRGSM/src</Value>
-      <Value>C:/Users/mosta/AppData/Local/arduino15/packages/arduino/hardware/samd/1.6.20/libraries/Wire</Value>
-      <Value>E:/Arduino/libraries/Adafruit_FRAM_I2C-master</Value>
-      <Value>E:/Arduino/libraries/MAX17048-master</Value>
-      <Value>E:/Arduino/libraries/SparkFun_BME280_I2C/src</Value>
-      <Value>E:/Arduino/libraries/RTCZero/src</Value>
-      <Value>E:/Arduino/libraries/Time-master</Value>
-      <Value>E:/Arduino/libraries/Adafruit_SleepyDog-master</Value>
-      <Value>E:/Arduino/libraries/TinyGSM-master/src</Value>
-      <Value>E:/Arduino/libraries/ArduinoHttpClient/src</Value>
-      <Value>E:/Arduino/libraries/StreamDebugger</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries</Value>
       <Value>C:/Users/mosta/AppData/Local/arduino15/packages/arduino/hardware/samd/1.6.20/libraries</Value>
       <Value>E:/Arduino/libraries</Value>
@@ -602,17 +569,6 @@ build.path=C:\Users\mosta\AppData\Local\Temp\VMBuilds\MKR1400_Wx\mkrgsm1400\Debu
   <armgcccpp.compiler.directories.IncludePaths>
     <ListValues>
       <Value>../../../MKR1400_Wx</Value>
-      <Value>E:/Arduino/libraries/MKRGSM/src</Value>
-      <Value>C:/Users/mosta/AppData/Local/arduino15/packages/arduino/hardware/samd/1.6.20/libraries/Wire</Value>
-      <Value>E:/Arduino/libraries/Adafruit_FRAM_I2C-master</Value>
-      <Value>E:/Arduino/libraries/MAX17048-master</Value>
-      <Value>E:/Arduino/libraries/SparkFun_BME280_I2C/src</Value>
-      <Value>E:/Arduino/libraries/RTCZero/src</Value>
-      <Value>E:/Arduino/libraries/Time-master</Value>
-      <Value>E:/Arduino/libraries/Adafruit_SleepyDog-master</Value>
-      <Value>E:/Arduino/libraries/TinyGSM-master/src</Value>
-      <Value>E:/Arduino/libraries/ArduinoHttpClient/src</Value>
-      <Value>E:/Arduino/libraries/StreamDebugger</Value>
       <Value>C:/Program Files (x86)/Arduino/libraries</Value>
       <Value>C:/Users/mosta/AppData/Local/arduino15/packages/arduino/hardware/samd/1.6.20/libraries</Value>
       <Value>E:/Arduino/libraries</Value>

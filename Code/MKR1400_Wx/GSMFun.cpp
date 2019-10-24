@@ -59,7 +59,7 @@ extern void resetWatchDog();
 extern int gethex(char *string);
 
 
-const char server[] = "scottn.ddns.net";
+const char server[] = "wxdata.scottnette.com";
 const char resource[] = "/ardu2SQL.php?d=12312";
 const int  port = 80;
 
@@ -85,7 +85,7 @@ bool getRequest()
 		client2.print("/getIP.php?d=123123");
 		client2.println(" HTTP/1.1");
 		client2.print("Host: ");
-		client2.println(server);
+		client2.println("wxdata.scottnette.com");
 		//client2.println("Connection: close");
 		client2.println();
 		Serial1.println("connected");
@@ -107,7 +107,7 @@ bool findIP(char *server, char *serverIP, int port) {
 	bool IPFind = false;
 	bool PortFind = false;
 
-	char ipAddr[] = "xxx.xxx.xxx.xxx\0";
+	char ipAddr[] = "wxdata.scottnette.com\0";
 	char ipPort[] = "000000\0";
 	bool connected = true;
 	char colonFind = ':';
@@ -123,7 +123,7 @@ bool findIP(char *server, char *serverIP, int port) {
 	
 	Serial1.println(F("IP config response read"));
 	// Parse response
-	while (connected) {
+	while (false) {
 		if (client2.available() && foundData) {
 			c = client2.read();		
 		
@@ -177,16 +177,18 @@ bool findIP(char *server, char *serverIP, int port) {
 
 		}
 	}
+	
+	client2.stop();
 	Serial1.println("** done IP - ");
 	delay(30);
 	// Save Data
 	if (done){
-		strcpy(serverData.serverIP,ipAddr);
-		serverData.portIP = atoi(ipPort);
-		Serial1.print(serverData.serverIP);
-		Serial1.print(":");
-		Serial1.println(serverData.portIP);
-		delay(30);
+	////	strcpy(serverData.serverIP,ipAddr);
+	//	serverData.portIP = atoi(ipPort);
+	//	Serial1.print(serverData.serverIP);
+	//	Serial1.print(":");
+	//	Serial1.println(serverData.portIP);
+	//	delay(30);
 		return true;
 	}
 	
@@ -270,12 +272,12 @@ bool sendPost(char *PostData)
 	Serial1.print("Post Req port - ");
 	Serial1.println(serverData.portIP);
 // Make a HTTP request:
-	if (client2.connect(serverData.serverIP,serverData.portIP)) {
+	if (client2.connect("wxdata.scottnette.com",80)) {
 		client2.print("POST ");
 		client2.print(serverData.path);
 		client2.println(" HTTP/1.1");
 		client2.print("Host: ");
-		client2.println(serverData.serverIP);
+		client2.println("wxdata.scottnette.com");
 	//	Serial1.print(":");
 		//Serial1.println(serverData.portIP);
 		
@@ -509,20 +511,190 @@ void getSignalStrength()
 	Serial1.println(" [0-31]");
 }
 
+
+void readGPRSResponseTime()
+{
+	bool connected = true;
+	char ID[] = "Date:\0";
+	char IDBuff[] = "XXXXX\0";
+	char DateBuff[] = "XXX, XX XXX XXXX XX:XX:XX \0";
+	byte idx = 0;
+	bool IDFound = 0;
+	
+	DateBuff[25] = 0;
+	while (connected) 
+	{
+		if (client2.available()) 
+		{
+			char c = client2.read();
+			//Serial1.print(c);
+			// Shift buffer and append right justified
+			memmove(IDBuff, &(IDBuff[1]), strlen(&(IDBuff[1])));
+			IDBuff[4] = c;
+			
+			if (c == 'G')
+			{
+				IDFound = 0;
+			}
+			
+			if (IDFound)
+			{
+				memmove(DateBuff, &(DateBuff[1]), strlen(&(DateBuff[1])));
+				DateBuff[25] = c;
+			}
+		}
+		
+		if (!strcmp(ID,IDBuff)){
+			IDFound = 1;
+		}
+
+		// if the server's disconnected, stop the client:
+		if (!client2.available() && !client2.connected())
+		{
+			Serial1.println();
+			Serial1.println("disconnecting.");
+			connected = false;
+			client2.stop();
+		}
+	}
+	
+	Serial1.println("-------");
+	Serial1.println(DateBuff);
+	
+	char *monthArray[12] = {"Jan\0", "Feb\0", "Mar\0", "Apr\0", "May\0", "Jun\0", "Jul\0", "Aug\0", "Sep\0", "Oct\0", "Nov\0", "Dec\0"};
+	char tmpDay[] = "XXX\0";
+
+	
+	
+	int httpMonth = 0;
+	int httpDay = 0;
+	int httpYear = 0;
+	int httpHour = 0;
+	int httpMin = 0;
+	int httpSec = 0;
+	
+	char strMonth[] = "XXX\0";
+	char strDay[] = "XX\0";
+	char strYear[] = "XXXX\0";
+	char strHour[] = "XX\0";
+	char strMin[] = "XX\0";
+	char strSec[] = "XX\0";
+	
+	strMonth[0] = DateBuff[8];
+	strMonth[1] = DateBuff[9];
+	strMonth[2] = DateBuff[10];
+	
+	strDay[0] = DateBuff[5];
+	strDay[1] = DateBuff[6];
+		
+	strYear[0] = DateBuff[12];
+	strYear[1] = DateBuff[13];
+	strYear[2] = DateBuff[14];
+	strYear[3] = DateBuff[15];
+			
+	strHour[0] = DateBuff[17];
+	strHour[1] = DateBuff[18];
+				
+	strMin[0] = DateBuff[20];
+	strMin[1] = DateBuff[21];
+					
+	strSec[0] = DateBuff[23];
+	strSec[1] = DateBuff[24];
+	
+/*	Serial1.println(strMonth);
+	Serial1.println(strDay);
+	Serial1.println(strYear);
+	Serial1.println(strHour);
+	Serial1.println(strMin);
+	Serial1.println(strSec);
+*/
+						
+	
+	for (int ii = 0; ii< 12; ii++)
+	{
+		if (!strcmp(monthArray[ii],strMonth))
+		{
+			httpMonth = ii +1;
+			break;
+		}
+	} 
+
+	httpDay = atoi(strDay);
+	httpYear = atoi(strYear);
+	httpHour = atoi(strHour);
+	httpMin = atoi(strMin);
+	httpSec = atoi(strSec);
+	
+	/*
+	Serial1.println(httpMonth);
+	Serial1.println(httpDay);
+	Serial1.println(httpYear);
+	Serial1.println(httpHour);
+	Serial1.println(httpMin);
+	Serial1.println(httpSec);
+	*/
+	if (httpHour - 7 < 0)
+	{
+		httpHour = httpHour + 24 -7;
+		httpDay  = httpDay -1;
+	}
+	else
+	{
+		httpHour = httpHour -7;
+	}
+
+
+	char CCLKStr[] = "04/01/01,00:00:34+00";
+	
+	sprintf(CCLKStr, "AT+CCLK=\"%.2d/%.2d/%.2d,%.2d:%.2d:%.2d+00\"",httpYear-2000, httpMonth,httpDay,httpHour,httpMin, httpSec);
+	Serial1.print("Sending this: ");
+	Serial1.println(CCLKStr);
+
+	String response;
+	MODEM.send(CCLKStr);
+	MODEM.waitForResponse(100, &response);
+	Serial1.println(response.c_str());
+	delay(100);
+}
+
+
+
+void HTTPGETTime()
+{
+	if (client2.connect("wxdata.scottnette.com",80)) {
+		client2.print("GET  ");
+		client2.print("/getIP.php?d=123123");
+		client2.println(" HTTP/1.1");
+		client2.print("Host: ");
+		client2.println("wxdata.scottnette.com");
+		client2.println("Connection: close");
+		client2.println();
+	}
+
+	 readGPRSResponseTime();
+}
+
+
 bool setFromGSMTime()
 {
 	time_t nowT;
 	time_t lastT;
 	struct tm readtime;
+	
+	HTTPGETTime();
 	nowT = gsmAccess.getLocalTime();
-		
+			
 	framTimeRead2(&readtime);
 	readtime.tm_year += 2018;
 	lastT = mktime(&readtime);
+	
+	Serial1.println(nowT);
+	Serial1.println(lastT);
 		
-	if (nowT < lastT){
+	if ((nowT < lastT)){
 		Serial1.println("failed time");
 		delay(100);
+		//rtcSetGSMTime(nowT);
 		return false;
 	}	
 	else{
@@ -593,7 +765,8 @@ bool sendToServer(bool findIPFlag)
 					break;
 
 				case findIPState:
-					if (!statusIP) statusIP = findIP(serverData.server, serverData.serverIP, PORT_IP);
+					//if (!statusIP) statusIP = findIP(serverData.server, serverData.serverIP, PORT_IP);
+					statusIP = true;
 					if (statusIP) State = updateTimeSignalState;
 					else State = connFail;
 					break;
